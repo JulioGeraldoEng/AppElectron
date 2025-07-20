@@ -12,9 +12,11 @@ Aplicativo desktop desenvolvido com Electron
 1. Clone o repositório:
 
 git clone https://github.com/JulioGeraldoEng/AppElectron.git
+
 cd AppElectron
 
 npm install
+
 npm start
 
 📦 Gerar instalador
