@@ -1,0 +1,43 @@
+{
+  "name": "app_electron",
+  "version": "1.0.0",
+  "description": "Aplicativo para desktop usando Electron",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "desktop"
+  ],
+  "author": {
+    "name": "Júlio Geraldo",
+    "email": "juliogeraldo.eng@gmail.com",
+    "url": "https://www.linkedin.com/in/juliogeraldo"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.app_electron",
+    "productName": "App Electron",
+    "directories": {
+      "output": "instalador-AppElectron"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "App Electron"
+    }
+  }
+}
