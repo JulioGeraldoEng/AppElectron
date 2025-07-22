@@ -87,3 +87,23 @@ No arquivo db.js, configure os parâmetros da conexão com o banco (usuário, se
 
 - O app pode ser acessado tanto via desktop (Electron) quanto via navegador na rede local, utilizando o endereço `http://<seu-ip-local>:3000`.  
 - Garanta que sua rede permita o acesso externo na porta 3000 para acessar via dispositivos móveis.
+
+## O que foi realizado até o momento
+
+Após configurar o ambiente e o banco de dados conforme descrito no README, implementamos a autenticação no aplicativo com os seguintes pontos principais:
+
+Servidor Express integrado ao Electron para fornecer rotas REST e servir os arquivos estáticos.
+
+Banco de dados PostgreSQL para armazenar os usuários e validar as credenciais de login.
+
+Sessões gerenciadas com express-session para manter o estado do usuário logado durante o uso do aplicativo.
+
+Login via IPC (Inter-Process Communication) do Electron, permitindo comunicação entre a interface (renderer) e o backend.
+
+Proteção de rotas no servidor para garantir acesso apenas de usuários autenticados.
+
+Logout funcional, que encerra a sessão do usuário e redireciona para a tela de login.
+
+Criação de janelas separadas no Electron para login (tela menor e fixa) e para o app principal (janela maior e redimensionável).
+
+Em resumo, o núcleo da autenticação está implementado, com controle de acesso básico e fluxo de login/logout funcionando tanto no app desktop quanto via navegador local.
