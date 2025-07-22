@@ -2,41 +2,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('login-form');
     const errorDiv = document.getElementById('error-message');
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    form.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
+    const isElectron = window && window.process && window.process.type;
 
-            const result = await response.json();
-
+    if (isElectron) {
+        const { ipcRenderer } = require('electron');
+        ipcRenderer.send('login-attempt', { email, password });
+    } else {
+        // Continua usando fetch apenas no navegador
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        })
+        .then(res => res.json())
+        .then(result => {
             if (result.success) {
-                // Detectar se está rodando dentro do Electron
-                const isElectron = window && window.process && window.process.type;
-
-                if (isElectron) {
-                    // Comunicação com processo principal via IPC
-                    const { ipcRenderer } = require('electron');
-                    ipcRenderer.send('login-attempt', { email, password });
-                } else {
-                    // Acesso via navegador — redireciona para index.html
-                    window.location.href = '/index.html';
-                }
+                window.location.href = '/index.html';
             } else {
                 errorDiv.textContent = result.message || 'Falha no login.';
             }
-        } catch (error) {
+        })
+        .catch((error) => {
             console.error('Erro na requisição:', error);
             errorDiv.textContent = 'Erro ao conectar com o servidor.';
-        }
+        });
+    }
     });
+
 });
