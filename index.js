@@ -1,85 +1,99 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const express = require('express');
 
 let loginWindow;
 let mainWindow;
 
-// Função para criar a janela de login
+// ----------- SERVIDOR EXPRESS -----------
+const servidor = express();
+const PORT = 3000;
+
+// Permite ler requisições JSON (ex: fetch com body)
+servidor.use(express.json());
+
+// Rota da página de login (deve vir antes do static)
+servidor.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'renderer', 'Login', 'login.html'));
+});
+
+// Servir arquivos estáticos (HTML, CSS, JS)
+servidor.use(express.static(path.join(__dirname, 'renderer')));
+
+// API de login
+servidor.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (email === 'julio@teste.com' && password === '123') {
+        return res.json({ success: true });
+    } else {
+        return res.json({ success: false, message: 'Email ou senha inválidos.' });
+    }
+});
+
+// Inicia o servidor Express
+servidor.listen(PORT, () => {
+    console.log(`Servidor Express rodando em http://localhost:${PORT}`);
+});
+
+// ----------- FUNÇÕES DE JANELAS -----------
 const createLoginWindow = () => {
     loginWindow = new BrowserWindow({
         width: 500,
         height: 700,
         resizable: false,
         webPreferences: {
-            // Importante para a segurança e para que o require() funcione no login.js
             contextIsolation: false,
             nodeIntegration: true,
         }
     });
 
-    loginWindow.loadFile('renderer/Login/login.html');
-
-    // Quando a janela de login for fechada, encerra o app
+    loginWindow.loadURL(`http://localhost:${PORT}/`);
     loginWindow.on('closed', () => {
         loginWindow = null;
     });
 };
 
-// Função para criar a janela principal (após o login)
 const createMainWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
         webPreferences: {
+            contextIsolation: false,
             nodeIntegration: true,
-            contextIsolation: false
         }
     });
-    // Supondo que você tenha um 'index.html' para seu app principal
-    // A linha abaixo é a que você deve usar
-    mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+
+    mainWindow.loadURL(`http://localhost:${PORT}/index.html`);
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+        createLoginWindow(); // Volta para login ao fechar janela principal
+    });
 };
 
+// ----------- CICLO DE VIDA DO APP -----------
 app.whenReady().then(createLoginWindow);
 
-
-// ---- LÓGICA DE LOGIN ----
-ipcMain.on('login-attempt', (event, credentials) => {
-    console.log('Tentativa de login recebida com:', credentials);
-
-    // !! LÓGICA DE VALIDAÇÃO FALSA !!
-    // Em um aplicativo real, você validaria isso em um banco de dados
-    // ou através de uma API.
-    if (credentials.email === 'julio@teste.com' && credentials.password === '123') {
-        
-        // Avisa o front-end que o login foi um sucesso
-        event.reply('login-response', { success: true });
-        
-        // Cria a janela principal e fecha a de login
-        createMainWindow();
-        if (loginWindow) {
-            loginWindow.close();
-        }
-
-    } else {
-        // Avisa o front-end que o login falhou
-        event.reply('login-response', { 
-            success: false, 
-            message: 'Email ou senha inválidos.' 
-        });
-    }
-});
-
-
-// Configurações padrão do ciclo de vida do app
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createLoginWindow();
+    }
+});
+
+// ----------- LÓGICA DE LOGIN PELO ELECTRON (IPC) -----------
+ipcMain.on('login-attempt', (event, credentials) => {
+    if (credentials.email === 'julio@teste.com' && credentials.password === '123') {
+        event.reply('login-response', { success: true });
+        createMainWindow();
+        if (loginWindow) loginWindow.close();
+    } else {
+        event.reply('login-response', {
+            success: false,
+            message: 'Email ou senha inválidos.'
+        });
     }
 });

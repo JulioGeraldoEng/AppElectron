@@ -39,5 +39,8 @@
       "createStartMenuShortcut": true,
       "shortcutName": "App Electron"
     }
+  },
+  "dependencies": {
+    "express": "^5.1.0"
   }
 }

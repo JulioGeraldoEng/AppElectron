@@ -1,29 +1,42 @@
-const { ipcRenderer } = require('electron');
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('login-form');
+    const errorDiv = document.getElementById('error-message');
 
-const form = document.getElementById('login-form');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const errorMessage = document.getElementById('error-message');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-form.addEventListener('submit', (event) => {
-    event.preventDefault(); // Impede o recarregamento da página
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    
-    // Limpa mensagens de erro antigas
-    errorMessage.textContent = '';
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-    // Envia as credenciais para o processo principal do Electron
-    ipcRenderer.send('login-attempt', { email, password });
-});
+            const result = await response.json();
 
-// Ouve a resposta do processo principal
-ipcRenderer.on('login-response', (event, response) => {
-    if (!response.success) {
-        // Se o login falhar, mostra a mensagem de erro
-        errorMessage.textContent = response.message;
-    }
-    // Se o login for bem-sucedido, o processo principal cuidará de fechar
-    // esta janela e abrir a janela principal do app.
+            if (result.success) {
+                // Detectar se está rodando dentro do Electron
+                const isElectron = window && window.process && window.process.type;
+
+                if (isElectron) {
+                    // Comunicação com processo principal via IPC
+                    const { ipcRenderer } = require('electron');
+                    ipcRenderer.send('login-attempt', { email, password });
+                } else {
+                    // Acesso via navegador — redireciona para index.html
+                    window.location.href = '/index.html';
+                }
+            } else {
+                errorDiv.textContent = result.message || 'Falha no login.';
+            }
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            errorDiv.textContent = 'Erro ao conectar com o servidor.';
+        }
+    });
 });
