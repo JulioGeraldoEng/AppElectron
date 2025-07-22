@@ -11,15 +11,21 @@ Aplicativo desktop desenvolvido com Electron, integrando servidor Express para a
 
 1. Clone o repositório:
 
-bash
+Na linha de comando rode:
+
     git clone https://github.com/JulioGeraldoEng/AppElectron.git
+    
     cd AppElectron
 
 2. Instale as dependências (incluindo Express automaticamente):
 
+Na linha de comando rode:
+
     npm install
 
 3. Inicie o aplicativo:
+
+Na linha de comando rode:
 
     npm start
 
