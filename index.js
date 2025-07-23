@@ -2,60 +2,58 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const authRoutes = require('./Routes/authRoutes'); // Supondo que você criou essa pasta/arquivo
-const db = require('./db'); // Conexão com PostgreSQL
+const authRoutes = require('./Routes/authRoutes');
+const adminRoutes = require('./Routes/adminRoutes');
+const funcionarioRoutes = require('./Routes/funcionarioRoutes');
+const clienteRoutes = require('./Routes/clienteRoutes');
+const { autenticar, autorizar } = require('./Middlewares/authMiddleware');
+const db = require('./db');
+const bcrypt = require('bcrypt');
 
 let loginWindow;
 let mainWindow;
 
-// ----------- SERVIDOR EXPRESS -----------
 const servidor = express();
 const PORT = 3000;
 
-// Middleware para JSON
 servidor.use(express.json());
 
-// Session middleware
 servidor.use(session({
   secret: 'sua_chave_secreta_segura',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // false pois não é HTTPS no Electron
+  cookie: { secure: false }
 }));
 
-// Usar rotas modulares para autenticação
+// Rotas principais
 servidor.use('/api/auth', authRoutes);
+servidor.use('/api/admin', autenticar, autorizar('admin'), adminRoutes);
+servidor.use('/api/funcionario', autenticar, autorizar('funcionario'), funcionarioRoutes);
+servidor.use('/api/cliente', autenticar, autorizar('cliente'), clienteRoutes);
 
-// Rota principal redireciona para login
+// Redirecionamento raiz
 servidor.get('/', (req, res) => {
   res.redirect('/Login/login.html');
 });
 
-// Servir arquivos estáticos (HTML, CSS, JS, etc)
 servidor.use(express.static(path.join(__dirname, 'renderer')));
 
-// Middleware para proteger rotas
-function protegerRota(req, res, next) {
-  if (req.session.usuarioAutenticado) {
+// Protege o acesso direto ao index.html
+servidor.get('/index.html', (req, res, next) => {
+  if (req.session.usuario) {
     next();
   } else {
     res.redirect('/Login/login.html');
   }
-}
-
-
-// Rota protegida (exemplo)
-servidor.get('/index.html', protegerRota, (req, res) => {
+}, (req, res) => {
   res.sendFile(path.join(__dirname, 'renderer', 'index.html'));
 });
 
-// Inicia o servidor Express
 servidor.listen(PORT, () => {
   console.log(`Servidor Express rodando em http://localhost:${PORT}`);
 });
 
-// ----------- CONFIGURAÇÕES JANELAS ELECTRON -----------
-// Mesma partição para compartilhar sessão entre janelas
+// --- Configurações Electron ---
 const webPreferencesConfig = {
   contextIsolation: false,
   nodeIntegration: true,
@@ -69,32 +67,24 @@ const createLoginWindow = () => {
     resizable: false,
     webPreferences: webPreferencesConfig
   });
-
   loginWindow.loadURL(`http://localhost:${PORT}/`);
-  loginWindow.on('closed', () => {
-    loginWindow = null;
-  });
+  loginWindow.on('closed', () => { loginWindow = null; });
 };
 
-const createMainWindow = () => {
+const createMainWindow = (page) => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     resizable: true,
     webPreferences: webPreferencesConfig
   });
-
-  mainWindow.loadURL(`http://localhost:${PORT}/index.html`);
+  mainWindow.loadFile(page);
   mainWindow.on('closed', () => {
     mainWindow = null;
-    // Ao fechar a janela principal, volta para login
-    if (!loginWindow) {
-      createLoginWindow();
-    }
+    if (!loginWindow) createLoginWindow();
   });
 };
 
-// ----------- CICLO DE VIDA DO APP -----------
 app.whenReady().then(createLoginWindow);
 
 app.on('window-all-closed', () => {
@@ -102,54 +92,38 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createLoginWindow();
-  }
+  if (BrowserWindow.getAllWindows().length === 0) createLoginWindow();
 });
 
-// ----------- COMUNICAÇÃO IPC -----------
-// Login via IPC
 ipcMain.on('login-attempt', async (event, credentials) => {
   const { email, password } = credentials;
-
   try {
-    const result = await db.query(
-      'SELECT * FROM usuarios WHERE email = $1 AND senha = $2',
-      [email, password]
-    );
-
-    if (result.rows.length > 0) {
-      event.reply('login-response', { success: true });
-      createMainWindow();
-      if (loginWindow) loginWindow.close();
-    } else {
-      event.reply('login-response', {
-        success: false,
-        message: 'Email ou senha inválidos.'
-      });
+    const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user || !(await bcrypt.compare(password, user.senha))) {
+      return event.reply('login-response', { success: false, message: 'Email ou senha inválidos.' });
     }
+    event.reply('login-response', { success: true, tipo: user.tipo });
+
+    let page = 'renderer/index.html';
+    if (user.tipo === 'admin') page = 'renderer/Admin/admin.html';
+    else if (user.tipo === 'funcionario') page = 'renderer/Funcionario/funcionario.html';
+    else if (user.tipo === 'cliente') page = 'renderer/Cliente/cliente.html';
+
+    createMainWindow(page);
+    if (loginWindow) loginWindow.close();
   } catch (err) {
     console.error('Erro ao consultar o banco:', err);
-    event.reply('login-response', {
-      success: false,
-      message: 'Erro interno ao verificar login.'
-    });
+    event.reply('login-response', { success: false, message: 'Erro interno ao verificar login.' });
   }
 });
 
-// Logout via IPC
 ipcMain.on('logout-request', (event) => {
-  // Fecha janela principal
   if (mainWindow) {
     mainWindow.close();
     mainWindow = null;
   }
-
-  // Abre janela de login se ainda não aberta
-  if (!loginWindow) {
-    createLoginWindow();
-  }
-
+  if (!loginWindow) createLoginWindow();
   event.reply('logout-response', { success: true });
 });
 

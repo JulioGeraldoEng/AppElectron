@@ -23,8 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(res => res.json())
             .then(result => {
+                console.log('Resposta do login:', result); // <-- Adicionado para debug
                 if (result.success) {
-                    window.location.href = '/index.html';
+                    const tipo = result.tipo;
+                    console.log('Tipo de usuário:', tipo); // <-- debug adicional
+
+                    if (tipo === 'admin') {
+                        window.location.href = '/Admin/admin.html';
+                    } else if (tipo === 'funcionario') {
+                        window.location.href = '/Funcionario/funcionario.html';
+                    } else if (tipo === 'cliente') {
+                        window.location.href = '/Cliente/cliente.html';
+                    } else {
+                        errorDiv.textContent = 'Tipo de usuário desconhecido.';
+                    }
                 } else {
                     errorDiv.textContent = result.message || 'Falha no login.';
                 }
