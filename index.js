@@ -7,6 +7,7 @@ const authRoutes = require('./Routes/authRoutes');
 const adminRoutes = require('./Routes/adminRoutes');
 const funcionarioRoutes = require('./Routes/funcionarioRoutes');
 const clienteRoutes = require('./Routes/clienteRoutes');
+// Middlewares de autenticação e autorização
 const { autenticar, autorizar } = require('./Middlewares/authMiddleware');
 const db = require('./db');
 const bcrypt = require('bcrypt');
@@ -38,6 +39,7 @@ servidor.use(express.static(path.join(__dirname, 'renderer')));
 servidor.use('/CadFuncionario', express.static(path.join(__dirname, 'renderer', 'CadFuncionario')));
 servidor.use('/CadCliente', express.static(path.join(__dirname, 'renderer', 'CadCliente')));
 servidor.use('/CadAdmin', express.static(path.join(__dirname, 'renderer', 'CadAdmin')));
+servidor.use('/api/funcionario', autenticar, autorizar('funcionario'), funcionarioRoutes);
 
 // Inicia o servidor Express
 servidor.listen(PORT, () => {

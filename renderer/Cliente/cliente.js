@@ -68,6 +68,31 @@ async function logout() {
   }
 }
 
+// Função para carregar dados do cliente na interface
+async function carregarDadosCliente() {
+  try {
+    const dados = await fetchComToken('/api/cliente/meus-dados');
+
+    if (dados && dados.success && dados.usuario) {
+      const usuario = dados.usuario;
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <p><strong>ID:</strong> ${usuario.id}</p>
+        <p><strong>Email:</strong> ${usuario.email}</p>
+        <p><strong>Tipo:</strong> ${usuario.tipo}</p>
+        <p><strong>Nome:</strong> ${usuario.nome || 'N/A'}</p>
+        <p><strong>CPF:</strong> ${usuario.cpf || 'N/A'}</p>
+        <p><strong>Endereço:</strong> ${usuario.endereco || 'N/A'}</p>
+      `;
+      document.body.appendChild(container);
+    } else {
+      console.error('Dados do cliente não disponíveis ou inválidos.');
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados do cliente:', error);
+  }
+}
+
 // Inicialização da página
 document.addEventListener('DOMContentLoaded', () => {
   verificarAutenticacao();
@@ -77,5 +102,5 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', logout);
   }
 
-  // Aqui pode-se incluir chamadas para carregar dados do cliente, se houver APIs para isso
+  carregarDadosCliente(); // 🔥 Chamada aqui!
 });

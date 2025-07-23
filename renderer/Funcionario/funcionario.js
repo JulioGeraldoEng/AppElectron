@@ -37,6 +37,34 @@ async function fetchComToken(url, options = {}) {
   return response.json();
 }
 
+// Função para carregar os dados básicos do funcionário
+async function carregarDadosFuncionario() {
+  try {
+    const dados = await fetchComToken('/api/funcionario/meus-dados');
+    if (dados && dados.success && dados.usuario) {
+      const usuario = dados.usuario;
+
+      // Cria um container para exibir dados do funcionário acima da lista de ordens
+      let container = document.getElementById('dados-funcionario');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'dados-funcionario';
+        document.body.insertBefore(container, document.getElementById('ordens-container'));
+      }
+
+      container.innerHTML = `
+        <p><strong>Nome:</strong> ${usuario.nome || 'Não informado'}</p>
+        <p><strong>Cargo:</strong> ${usuario.cargo || 'Não informado'}</p>
+        <p><strong>Telefone:</strong> ${usuario.telefone || 'Não informado'}</p>
+      `;
+    } else {
+      console.warn('Dados do funcionário não disponíveis ou inválidos.');
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados do funcionário:', error);
+  }
+}
+
 // Função para carregar as ordens de serviço do funcionário
 async function carregarOrdens() {
   const ordensList = document.getElementById('ordens-list');
@@ -45,6 +73,13 @@ async function carregarOrdens() {
     const data = await fetchComToken('/api/funcionario/ordens');
     if (data && data.message) {
       ordensList.innerHTML = `<li>${data.message}</li>`;
+    } else if (data && Array.isArray(data.ordens) && data.ordens.length > 0) {
+      ordensList.innerHTML = '';
+      data.ordens.forEach(ordem => {
+        const li = document.createElement('li');
+        li.textContent = ordem; // Ajuste aqui caso ordem seja objeto
+        ordensList.appendChild(li);
+      });
     } else {
       ordensList.innerHTML = '<li>Não há ordens para exibir.</li>';
     }
@@ -89,6 +124,7 @@ async function logout() {
 document.addEventListener('DOMContentLoaded', () => {
   verificarAutenticacao();
 
+  carregarDadosFuncionario();
   carregarOrdens();
 
   const logoutBtn = document.getElementById('logout-button');
