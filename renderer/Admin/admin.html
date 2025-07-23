@@ -1,1 +1,42 @@
-<h1>Bem-vindo, administrador!</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel do Administrador</title>
+  <style>
+    table {
+      width: 80%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bem-vindo, administrador!</h1>
+  <h2>Aplicativo Electron Iniciado</h2>
+  <button id="logout-button" style="position: fixed; top: 10px; right: 10px;">Sair</button>
+
+  <table id="usuarios-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>E-mail</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Usuários serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <script src="../Admin/admin.js"></script>
+</body>
+</html>

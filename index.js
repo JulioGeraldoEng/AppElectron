@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const express = require('express');
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
+
 const authRoutes = require('./Routes/authRoutes');
 const adminRoutes = require('./Routes/adminRoutes');
 const funcionarioRoutes = require('./Routes/funcionarioRoutes');
@@ -9,6 +10,9 @@ const clienteRoutes = require('./Routes/clienteRoutes');
 const { autenticar, autorizar } = require('./Middlewares/authMiddleware');
 const db = require('./db');
 const bcrypt = require('bcrypt');
+
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 let loginWindow;
 let mainWindow;
@@ -18,37 +22,21 @@ const PORT = 3000;
 
 servidor.use(express.json());
 
-servidor.use(session({
-  secret: 'sua_chave_secreta_segura',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-}));
-
-// Rotas principais
+// Rotas públicas e protegidas
 servidor.use('/api/auth', authRoutes);
 servidor.use('/api/admin', autenticar, autorizar('admin'), adminRoutes);
 servidor.use('/api/funcionario', autenticar, autorizar('funcionario'), funcionarioRoutes);
 servidor.use('/api/cliente', autenticar, autorizar('cliente'), clienteRoutes);
 
-// Redirecionamento raiz
+// Redirecionamento da raiz para tela de login web
 servidor.get('/', (req, res) => {
   res.redirect('/Login/login.html');
 });
 
+// Servir arquivos estáticos da pasta renderer
 servidor.use(express.static(path.join(__dirname, 'renderer')));
 
-// Protege o acesso direto ao index.html
-servidor.get('/index.html', (req, res, next) => {
-  if (req.session.usuario) {
-    next();
-  } else {
-    res.redirect('/Login/login.html');
-  }
-}, (req, res) => {
-  res.sendFile(path.join(__dirname, 'renderer', 'index.html'));
-});
-
+// Inicia o servidor Express
 servidor.listen(PORT, () => {
   console.log(`Servidor Express rodando em http://localhost:${PORT}`);
 });
@@ -60,6 +48,7 @@ const webPreferencesConfig = {
   partition: 'persist:pitstop'
 };
 
+// Janela de login Electron (carrega login web via localhost)
 const createLoginWindow = () => {
   loginWindow = new BrowserWindow({
     width: 500,
@@ -71,6 +60,7 @@ const createLoginWindow = () => {
   loginWindow.on('closed', () => { loginWindow = null; });
 };
 
+// Janela principal Electron, carrega página via URL do servidor Express para manter contexto
 const createMainWindow = (page) => {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -78,13 +68,20 @@ const createMainWindow = (page) => {
     resizable: true,
     webPreferences: webPreferencesConfig
   });
-  mainWindow.loadFile(page);
+
+  // Remove o prefixo 'renderer/' para formar a URL relativa correta
+  const relativePath = page.replace(/^renderer\//, '');
+
+  // Carrega via URL do servidor Express para manter o contexto compartilhado (localStorage, cookies)
+  mainWindow.loadURL(`http://localhost:${PORT}/${relativePath}`);
+
   mainWindow.on('closed', () => {
     mainWindow = null;
     if (!loginWindow) createLoginWindow();
   });
 };
 
+// Inicializa o app Electron
 app.whenReady().then(createLoginWindow);
 
 app.on('window-all-closed', () => {
@@ -95,29 +92,43 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createLoginWindow();
 });
 
+// --- IPC para login via Electron com JWT ---
 ipcMain.on('login-attempt', async (event, credentials) => {
   const { email, password } = credentials;
   try {
     const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     const user = result.rows[0];
+
     if (!user || !(await bcrypt.compare(password, user.senha))) {
       return event.reply('login-response', { success: false, message: 'Email ou senha inválidos.' });
     }
-    event.reply('login-response', { success: true, tipo: user.tipo });
 
+    // Gera token JWT válido por 2 horas
+    const token = jwt.sign(
+      { id: user.id, email: user.email, tipo: user.tipo },
+      JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    event.reply('login-response', { success: true, tipo: user.tipo, token });
+
+    // Abre a janela principal conforme tipo de usuário
     let page = 'renderer/index.html';
     if (user.tipo === 'admin') page = 'renderer/Admin/admin.html';
     else if (user.tipo === 'funcionario') page = 'renderer/Funcionario/funcionario.html';
     else if (user.tipo === 'cliente') page = 'renderer/Cliente/cliente.html';
 
     createMainWindow(page);
+
     if (loginWindow) loginWindow.close();
+
   } catch (err) {
     console.error('Erro ao consultar o banco:', err);
     event.reply('login-response', { success: false, message: 'Erro interno ao verificar login.' });
   }
 });
 
+// IPC para logout no Electron: fecha janela principal e abre login
 ipcMain.on('logout-request', (event) => {
   if (mainWindow) {
     mainWindow.close();
@@ -125,15 +136,4 @@ ipcMain.on('logout-request', (event) => {
   }
   if (!loginWindow) createLoginWindow();
   event.reply('logout-response', { success: true });
-});
-
-servidor.post('/api/auth/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Erro ao fazer logout:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao sair.' });
-    }
-    res.clearCookie('connect.sid');
-    res.json({ success: true });
-  });
 });

@@ -1,5 +1,9 @@
+require('dotenv').config();  // Carrega as variáveis do .env
 const bcrypt = require('bcrypt');
 const db = require('../db');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 async function login(req, res) {
   const { email, password } = req.body;
@@ -23,10 +27,19 @@ async function login(req, res) {
       return res.status(401).json({ success: false, message: 'Senha incorreta.' });
     }
 
-    // Aqui alterei para salvar o objeto na sessão com a chave 'usuario' e incluir tipo
-    req.session.usuario = { id: user.id, tipo: user.tipo, email: user.email };
-    console.log('Login bem-sucedido:', req.session.usuario); // debug
-    res.json({ success: true, tipo: user.tipo });
+    // Gerar JWT
+    const token = jwt.sign(
+      { id: user.id, email: user.email, tipo: user.tipo },
+      JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.json({
+      success: true,
+      message: 'Login bem-sucedido.',
+      token,
+      tipo: user.tipo
+    });
 
   } catch (error) {
     console.error('Erro ao fazer login:', error);
@@ -34,15 +47,9 @@ async function login(req, res) {
   }
 }
 
+// Logout apenas responde sucesso, o cliente deve apagar o token localmente
 function logout(req, res) {
-  req.session.destroy(err => {
-    if (err) {
-      console.error('Erro ao encerrar sessão:', err);
-      return res.status(500).json({ success: false, message: 'Erro ao sair.' });
-    }
-    res.clearCookie('connect.sid');
-    res.json({ success: true });
-  });
+  res.json({ success: true, message: 'Logout realizado com sucesso (cliente).' });
 }
 
 module.exports = {

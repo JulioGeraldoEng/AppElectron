@@ -2,6 +2,9 @@ document.getElementById('logout-button').addEventListener('click', async () => {
     // Detecta se está no Electron
     const isElectron = window && window.process && window.process.type;
 
+    // Remove token local em ambos os casos
+    localStorage.removeItem('token');
+
     if (isElectron) {
         const { ipcRenderer } = require('electron');
         ipcRenderer.send('logout-request');
@@ -15,9 +18,9 @@ document.getElementById('logout-button').addEventListener('click', async () => {
         });
     } else {
         try {
-            const response = await fetch('/api/auth/logout', {  // corrigir a rota aqui
-                method: 'POST',
-                credentials: 'include'  // importante para enviar cookies da sessão
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST'
+                // Não é necessário 'credentials: include' pois não usamos sessão
             });
 
             const result = await response.json();
