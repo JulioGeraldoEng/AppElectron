@@ -3,40 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <title>Painel do Administrador</title>
-  <style>
-    table {
-      width: 80%;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #eee;
-    }
-  </style>
 </head>
 <body>
-  <h1>Bem-vindo, administrador!</h1>
-  <h2>Aplicativo Electron Iniciado</h2>
-  <button id="logout-button" style="position: fixed; top: 10px; right: 10px;">Sair</button>
+  <h1>Painel do Administrador</h1>
 
-  <table id="usuarios-table">
+  <button id="btn-cadastrar-funcionario">Cadastrar Funcionário</button>
+  <button id="btn-cadastrar-cliente">Cadastrar Cliente</button>
+  <button id="btn-cadastrar-admin">Cadastrar Admin</button>
+
+  <button id="logout-button">Sair</button>
+
+  <h2>Usuários Cadastrados</h2>
+  <table id="usuarios-table" border="1">
     <thead>
       <tr>
         <th>ID</th>
-        <th>E-mail</th>
+        <th>Email</th>
         <th>Tipo</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Usuários serão inseridos aqui -->
+      <!-- preenchido via JS -->
     </tbody>
   </table>
 
-  <script src="../Admin/admin.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>

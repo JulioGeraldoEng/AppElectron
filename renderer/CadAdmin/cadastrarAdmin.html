@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastrar Administrador</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cadastrar Novo Administrador</h1>
+
+  <form id="form-cadastrar-admin">
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" name="senha" required />
+
+    <label for="nome">Nome Completo:</label>
+    <input type="text" id="nome" name="nome" required />
+
+    <label for="telefone">Telefone:</label>
+    <input type="text" id="telefone" name="telefone" />
+
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <button id="btn-voltar" type="button">Voltar</button>
+
+  <div class="msg" id="mensagem"></div>
+
+  <script src="cadastrarAdmin.js"></script>
+</body>
+</html>

@@ -1,9 +1,7 @@
-// Função para obter token JWT do localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
 
-// Redireciona para login se não houver token
 function verificarAutenticacao() {
   const token = getToken();
   if (!token) {
@@ -11,7 +9,6 @@ function verificarAutenticacao() {
   }
 }
 
-// Função para fazer fetch com token JWT no header Authorization
 async function fetchComToken(url, options = {}) {
   const token = getToken();
   if (!token) {
@@ -28,7 +25,6 @@ async function fetchComToken(url, options = {}) {
   const response = await fetch(url, { ...options, headers });
 
   if (response.status === 401 || response.status === 403) {
-    // Token inválido ou expirado
     localStorage.removeItem('token');
     window.location.href = '/Login/login.html';
     return;
@@ -37,15 +33,14 @@ async function fetchComToken(url, options = {}) {
   return response.json();
 }
 
-// Função para carregar e exibir usuários na tabela
 async function carregarUsuarios() {
   const dados = await fetchComToken('/api/admin/usuarios');
-  if (!dados) return;
+  if (!dados || !dados.usuarios) return;
 
   const tbody = document.querySelector('#usuarios-table tbody');
-  tbody.innerHTML = ''; // Limpa tabela antes de preencher
+  tbody.innerHTML = '';
 
-  dados.forEach(usuario => {
+  dados.usuarios.forEach(usuario => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${usuario.id}</td>
@@ -56,46 +51,27 @@ async function carregarUsuarios() {
   });
 }
 
-// Função de logout, removendo token e redirecionando para login
 async function logout() {
-  try {
-    localStorage.removeItem('token');
-
-    const isElectron = window && window.process && window.process.type;
-
-    if (isElectron) {
-      const { ipcRenderer } = require('electron');
-      ipcRenderer.send('logout-request');
-      ipcRenderer.once('logout-response', (event, result) => {
-        if (result.success) {
-          window.location.href = '/Login/login.html';
-        } else {
-          alert('Falha ao sair. Tente novamente.');
-        }
-      });
-    } else {
-      // Rota logout no servidor apenas para padrão REST (não obrigatória com JWT)
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      const result = await response.json();
-      if (result.success) {
-        window.location.href = '/Login/login.html';
-      } else {
-        alert('Falha ao sair. Tente novamente.');
-      }
-    }
-  } catch (error) {
-    console.error('Erro no logout:', error);
-  }
+  localStorage.removeItem('token');
+  window.location.href = '/Login/login.html';
 }
 
-// Inicializa eventos da página
 document.addEventListener('DOMContentLoaded', () => {
   verificarAutenticacao();
-
-  const logoutBtn = document.getElementById('logout-button');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logout);
-  }
-
   carregarUsuarios();
+
+  document.getElementById('logout-button')?.addEventListener('click', logout);
+
+  document.getElementById('btn-cadastrar-funcionario').addEventListener('click', () => {
+    window.location.href = '/CadFuncionario/cadastrarFuncionario.html';
+  });
+
+  document.getElementById('btn-cadastrar-cliente').addEventListener('click', () => {
+    window.location.href = '/CadCliente/cadastrarCliente.html';
+  });
+
+  document.getElementById('btn-cadastrar-admin').addEventListener('click', () => {
+    window.location.href = '/CadAdmin/cadastrarAdmin.html';
+  });
+
 });

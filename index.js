@@ -35,6 +35,9 @@ servidor.get('/', (req, res) => {
 
 // Servir arquivos estáticos da pasta renderer
 servidor.use(express.static(path.join(__dirname, 'renderer')));
+servidor.use('/CadFuncionario', express.static(path.join(__dirname, 'renderer', 'CadFuncionario')));
+servidor.use('/CadCliente', express.static(path.join(__dirname, 'renderer', 'CadCliente')));
+servidor.use('/CadAdmin', express.static(path.join(__dirname, 'renderer', 'CadAdmin')));
 
 // Inicia o servidor Express
 servidor.listen(PORT, () => {
