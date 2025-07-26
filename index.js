@@ -2,7 +2,6 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-
 const authRoutes = require('./Routes/authRoutes');
 const adminRoutes = require('./Routes/adminRoutes');
 const funcionarioRoutes = require('./Routes/funcionarioRoutes');
@@ -28,6 +27,10 @@ servidor.use('/api/auth', authRoutes);
 servidor.use('/api/admin', autenticar, autorizar('admin'), adminRoutes);
 servidor.use('/api/funcionario', autenticar, autorizar('funcionario'), funcionarioRoutes);
 servidor.use('/api/cliente', autenticar, autorizar('cliente'), clienteRoutes);
+
+servidor.get('/painel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'renderer/template/index.html'));
+});
 
 // Redirecionamento da raiz para tela de login web
 servidor.get('/', (req, res) => {

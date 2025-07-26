@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Responsivo</title>
+  <link rel="stylesheet" href="/template/style.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header" onclick="toggleSidebar()">
+        <span class="logo">📊</span>
+        <span class="title">Painel</span>
+      </div>
+
+      <div class="user-info">
+        <i data-lucide="user" class="user-icon"></i>
+        <span id="nome-usuario">Usuário</span>
+      </div>
+
+      <ul>
+        <li>
+          <a href="#" title="Página Inicial">
+            <i data-lucide="home"></i>
+            <span class="text">Início</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" title="Perfil">
+            <i data-lucide="settings"></i>
+            <span class="text">Configurações</span>
+          </a>
+        </li>
+        <li>
+          <a href="/logout" title="Sair">
+            <i data-lucide="log-out"></i>
+            <span class="text">Sair</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <h1>Bem-vindo ao Painel</h1>
+      <p>Este é o conteúdo principal da aplicação.</p>
+    </main>
+  </div>
+
+  <script src="/template/script.js"></script>
+  <script>
+    lucide.createIcons();
+
+    // Substitua isso pela lógica real com o nome do usuário logado
+    const nomeUsuario = "João Silva"; // Exemplo: recuperado via fetch ou session
+    document.getElementById("nome-usuario").textContent = nomeUsuario;
+  </script>
+</body>
+</html>

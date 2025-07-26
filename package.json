@@ -41,11 +41,13 @@
     }
   },
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "bcrypt": "^6.0.0",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "pg": "^8.16.3"
   }
 }
