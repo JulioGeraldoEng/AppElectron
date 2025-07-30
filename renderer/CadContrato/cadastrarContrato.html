@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastrar Contrato</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cadastrar Novo Contrato</h1>
+
+  <form id="form-cadastrar-contrato">
+    <label for="id_cliente">Cliente:</label>
+    <select id="id_cliente" name="id_cliente" required></select>
+
+    <label for="id_plano">Plano:</label>
+    <select id="id_plano" name="id_plano" required></select>
+
+    <label for="data_inicio">Data de Início:</label>
+    <input type="date" id="data_inicio" name="data_inicio" required>
+
+    <label for="data_fim">Data de Fim:</label>
+    <input type="date" id="data_fim" name="data_fim">
+
+    <label for="status">Status:</label>
+    <select id="status" name="status" required>
+      <option value="ativo">Ativo</option>
+      <option value="inativo">Inativo</option>
+    </select>
+
+    <label for="forma_pagamento">Forma de Pagamento:</label>
+    <select id="forma_pagamento" name="forma_pagamento" required>
+      <option value="boleto">Boleto</option>
+      <option value="cartão">Cartão</option>
+      <option value="pix">Pix</option>
+    </select>
+
+    <label for="observacoes">Observações:</label>
+    <input type="text" id="observacoes" name="observacoes">
+
+    <label for="valor_mensal">Valor Mensal:</label>
+    <input type="number" step="0.01" min="0" id="valor_mensal" name="valor_mensal" required>
+
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <button id="btn-voltar" type="button">Voltar</button>
+  <div class="msg" id="mensagem"></div>
+
+  <script src="cadastrarContrato.js"></script>
+</body>
+</html>

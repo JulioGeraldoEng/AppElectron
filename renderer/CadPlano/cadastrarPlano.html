@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastrar Planos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cadastrar Novo Plano</h1>
+
+  <form id="form-cadastrar-plano">
+    <label for="nome_plano">Nome do Plano:</label>
+    <input type="text" id="nome_plano" name="nome_plano" required />
+
+    <label for="velocidade_download">Velocidade de Download (Mbps):</label>
+    <input type="number" id="velocidade_download" name="velocidade_download" required min="1" step="0.1" />
+
+    <label for="velocidade_upload">Velocidade de Upload (Mbps):</label>
+    <input type="number" id="velocidade_upload" name="velocidade_upload" required min="1" step="0.1" />
+
+    <label for="preco">Preço (R$):</label>
+    <input type="number" id="preco" name="preco" required min="0.01" step="0.01" />
+
+    <label for="descricao">Descrição (opcional):</label>
+    <input type="text" id="descricao" name="descricao" />
+
+    <label for="franquia_dados">Franquia de Dados (GB - opcional):</label>
+    <input type="number" id="franquia_dados" name="franquia_dados" min="0" step="1" />
+
+    <label for="tipo_conexao">Tipo de Conexão:</label>
+    <select id="tipo_conexao" name="tipo_conexao" required>
+      <option value="">Selecione</option>
+      <option value="fibra">Fibra</option>
+      <option value="rádio">Rádio</option>
+      <option value="cabo">Cabo</option>
+      <option value="satélite">Satélite</option>
+    </select>
+
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <button id="btn-voltar" type="button">Voltar</button>
+
+  <div class="msg" id="mensagem"></div>
+
+  <script src="cadastrarPlano.js"></script>
+</body>
+</html>

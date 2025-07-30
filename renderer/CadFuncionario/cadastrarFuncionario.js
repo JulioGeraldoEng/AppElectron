@@ -46,8 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
       email: form.email.value.trim(),
       senha: form.senha.value.trim(),
       nome: form.nome.value.trim(),
-      cargo: form.cargo.value.trim(),
-      telefone: form.telefone.value.trim(),
+      cargo: form.cargo.value.trim() || null,
+      telefone: form.telefone.value.trim() || null,
+      endereco: form.endereco.value.trim() || null,
+      cpf: form.cpf.value.trim() || null,
+      rg: form.rg.value.trim() || null,
+      data_nascimento: form.data_nascimento.value || null,
+      data_admissao: form.data_admissao.value || null,
     };
 
     if (!data.email || !data.senha || !data.nome) {
@@ -76,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // CORREÇÃO DO CAMINHO AQUI:
   document.getElementById('btn-voltar').addEventListener('click', () => {
     window.location.href = '/Admin/admin.html';
   });

@@ -17,7 +17,8 @@
     }
     input[type="text"],
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="date"] {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
@@ -38,21 +39,36 @@
 <body>
   <h1>Cadastrar Novo Funcionário</h1>
 
-  <form id="form-cadastrar-funcionario">
-    <label for="email">E-mail:</label>
-    <input type="email" id="email" name="email" required />
+  <form id="form-cadastrar-funcionario" autocomplete="off">
+    <label for="email">E-mail:<span style="color: red;">*</span></label>
+    <input type="email" id="email" name="email" required placeholder="exemplo@provedor.com" />
 
-    <label for="senha">Senha:</label>
-    <input type="password" id="senha" name="senha" required />
+    <label for="senha">Senha:<span style="color: red;">*</span></label>
+    <input type="password" id="senha" name="senha" required placeholder="Digite uma senha segura" />
 
-    <label for="nome">Nome Completo:</label>
-    <input type="text" id="nome" name="nome" required />
+    <label for="nome">Nome Completo:<span style="color: red;">*</span></label>
+    <input type="text" id="nome" name="nome" required placeholder="Nome completo" />
 
     <label for="cargo">Cargo:</label>
-    <input type="text" id="cargo" name="cargo" />
+    <input type="text" id="cargo" name="cargo" placeholder="Ex: Técnico, Atendimento" />
 
     <label for="telefone">Telefone:</label>
-    <input type="text" id="telefone" name="telefone" />
+    <input type="text" id="telefone" name="telefone" placeholder="(11) 99999-9999" />
+
+    <label for="endereco">Endereço:</label>
+    <input type="text" id="endereco" name="endereco" placeholder="Rua, número, bairro" />
+
+    <label for="cpf">CPF:</label>
+    <input type="text" id="cpf" name="cpf" placeholder="Somente números" maxlength="11" />
+
+    <label for="rg">RG:</label>
+    <input type="text" id="rg" name="rg" placeholder="Somente números" maxlength="9" />
+
+    <label for="data_nascimento">Data de Nascimento:</label>
+    <input type="date" id="data_nascimento" name="data_nascimento" />
+
+    <label for="data_admissao">Data de Admissão:</label>
+    <input type="date" id="data_admissao" name="data_admissao" />
 
     <button type="submit">Cadastrar</button>
   </form>

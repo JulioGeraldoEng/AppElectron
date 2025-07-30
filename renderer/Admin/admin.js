@@ -74,4 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = '/CadAdmin/cadastrarAdmin.html';
   });
 
+  document.getElementById('btn-cadastrar-plano').addEventListener('click', () => {
+    window.location.href = '/CadPlano/cadastrarPlano.html';
+  });
+
+  document.getElementById('btn-cadastrar-contrato').addEventListener('click', () => {
+    window.location.href = '/CadContrato/cadastrarContrato.html';
+  });
+
+  document.getElementById('btn-cadastrar-equipamento').addEventListener('click', () => {
+    window.location.href = '/CadEquipamento/cadastrarEquipamento.html';
+  });
+
+  document.getElementById('btn-cadastrar-conexao').addEventListener('click', () => {
+    window.location.href = '/CadConexao/cadastrarConexao.html';
+  });
+
 });

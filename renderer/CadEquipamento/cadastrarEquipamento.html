@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Equipamento</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px; }
+    .msg { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Cadastrar Equipamento</h1>
+  <form id="form-equipamento">
+    <label for="tipo">Tipo:</label>
+    <select id="tipo" required>
+      <option value="">Selecione</option>
+      <option value="roteador">Roteador</option>
+      <option value="modem">Modem</option>
+      <option value="switch">Switch</option>
+    </select>
+
+    <label for="marca">Marca:</label>
+    <input type="text" id="marca" required>
+
+    <label for="modelo">Modelo:</label>
+    <input type="text" id="modelo" required>
+
+    <label for="numero_serie">Número de Série:</label>
+    <input type="text" id="numero_serie" required>
+
+    <label for="data_aquisicao">Data de Aquisição:</label>
+    <input type="date" id="data_aquisicao" required>
+
+    <label for="status">Status:</label>
+    <select id="status" required>
+      <option value="">Selecione</option>
+      <option value="em uso">Em uso</option>
+      <option value="em estoque">Em estoque</option>
+      <option value="com defeito">Com defeito</option>
+    </select>
+
+    <label for="id_cliente">Cliente:</label>
+    <select id="id_cliente" required></select>
+
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <button id="btn-voltar">Voltar</button>
+  <div class="msg" id="mensagem"></div>
+
+  <script src="cadastrarEquipamento.js"></script>
+</body>
+</html>

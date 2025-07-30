@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Conexão</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px; }
+    .msg { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Cadastrar Nova Conexão</h1>
+  <form id="form-cadastrar-conexao">
+    
+    <label for="id_cliente">Cliente:</label>
+    <select id="id_cliente" required></select>
+
+    <label>Equipamento:</label>
+    <select id="id_equipamento" required></select>
+
+    <label>Data de Conexão:</label>
+    <input type="datetime-local" id="data_conexao" required>
+
+    <label>IP Público:</label>
+    <input type="text" id="ip_publico" required>
+
+    <label>MAC Address:</label>
+    <input type="text" id="mac_address" required>
+
+    <label>Velocidade Download (Mbps):</label>
+    <input type="number" id="velocidade_download" required>
+
+    <label>Velocidade Upload (Mbps):</label>
+    <input type="number" id="velocidade_upload" required>
+
+    <label>Duração Sessão (segundos):</label>
+    <input type="number" id="duracao_sessao" required>
+
+    <label>Status:</label>
+    <select id="status" required>
+      <option value="conectado">Conectado</option>
+      <option value="desconectado">Desconectado</option>
+    </select>
+
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <button id="btn-voltar">Voltar</button>
+  <div id="mensagem"></div>
+
+  <script src="cadastrarConexao.js"></script>
+</body>
+</html>
